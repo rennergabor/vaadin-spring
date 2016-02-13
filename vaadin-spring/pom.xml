@@ -83,6 +83,7 @@
 
                             <Vaadin-License-Title>${Vaadin-License-Title}</Vaadin-License-Title>
                         </manifestEntries>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                     <!-- exclude other META-INF data under build directory -->
                     <includes>
