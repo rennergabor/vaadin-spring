@@ -15,11 +15,11 @@
  */
 package com.vaadin.spring.boot.internal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.vaadin.server.Constants;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.spring.Spring3xUtil;
+import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.server.SpringVaadinServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,10 +35,10 @@ import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.mvc.ServletForwardingController;
 
-import com.vaadin.server.Constants;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.server.SpringVaadinServlet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Spring configuration that sets up a
@@ -58,7 +58,7 @@ import com.vaadin.spring.server.SpringVaadinServlet;
  * and path info on the fly as those produced by
  * {@link ServletForwardingController} are not what {@link VaadinServlet}
  * expects. See {@link SpringVaadinServlet} for more information on this.
- * 
+ *
  * @author Petter Holmström (petter@vaadin.com)
  * @author Henri Sara (hesara@vaadin.com)
  */
@@ -116,7 +116,8 @@ public class VaadinServletConfiguration implements InitializingBean {
         List<String> uiMappings = new ArrayList<String>();
         logger.info("Checking the application context for Vaadin UI mappings");
         // more checks are performed by the UI provider
-        final String[] uiBeanNames = applicationContext
+        Spring3xUtil util = new Spring3xUtil(applicationContext);
+        final String[] uiBeanNames = util
                 .getBeanNamesForAnnotation(SpringUI.class);
         for (String uiBeanName : uiBeanNames) {
             SpringUI annotation = applicationContext.findAnnotationOnBean(
@@ -133,7 +134,7 @@ public class VaadinServletConfiguration implements InitializingBean {
     /**
      * Forwarding controller that sends requests for the root page of Vaadin
      * servlets to the Vaadin servlet.
-     * 
+     *
      * @return forwarding controller
      */
     @Bean
@@ -149,7 +150,7 @@ public class VaadinServletConfiguration implements InitializingBean {
     /**
      * Returns true if the Vaadin servlet is mapped to the context root, false
      * otherwise.
-     * 
+     *
      * @return true if the Vaadin servlet is mapped to the context root
      */
     protected boolean isMappedToRoot() {
@@ -201,7 +202,7 @@ public class VaadinServletConfiguration implements InitializingBean {
 
         // this is a hack to make is possible for Vaadin and Spring MVC
         // applications to co-exist in the same global "namespace"
-        if (servlet instanceof SpringVaadinServlet && isMappedToRoot()) {
+        if ((servlet instanceof SpringVaadinServlet) && isMappedToRoot()) {
             SpringVaadinServlet vaadinServlet = (SpringVaadinServlet) servlet;
             vaadinServlet.setServiceUrlPath(DEFAULT_SERVLET_URL_BASE);
         }

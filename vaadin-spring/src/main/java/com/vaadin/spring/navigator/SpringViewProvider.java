@@ -15,13 +15,16 @@
  */
 package com.vaadin.spring.navigator;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-
-import javax.annotation.PostConstruct;
-
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewProvider;
+import com.vaadin.spring.Spring3xUtil;
+import com.vaadin.spring.access.ViewAccessControl;
+import com.vaadin.spring.access.ViewInstanceAccessControl;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.internal.Conventions;
+import com.vaadin.spring.internal.ViewCache;
+import com.vaadin.spring.internal.ViewScopeImpl;
+import com.vaadin.ui.UI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -31,15 +34,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewProvider;
-import com.vaadin.spring.access.ViewAccessControl;
-import com.vaadin.spring.access.ViewInstanceAccessControl;
-import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.spring.internal.Conventions;
-import com.vaadin.spring.internal.ViewCache;
-import com.vaadin.spring.internal.ViewScopeImpl;
-import com.vaadin.ui.UI;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import javax.annotation.PostConstruct;
 
 /**
  * A Vaadin {@link ViewProvider} that fetches the views from the Spring
@@ -132,8 +132,8 @@ public class SpringViewProvider implements ViewProvider {
     void init() {
         LOGGER.info("Looking up SpringViews");
         int count = 0;
-        final String[] viewBeanNames = applicationContext
-                .getBeanNamesForAnnotation(SpringView.class);
+        Spring3xUtil util = new Spring3xUtil(applicationContext);
+        final String[] viewBeanNames = util.getBeanNamesForAnnotation(SpringView.class);
         for (String beanName : viewBeanNames) {
             final Class<?> type = applicationContext.getType(beanName);
             if (View.class.isAssignableFrom(type)) {
@@ -208,7 +208,7 @@ public class SpringViewProvider implements ViewProvider {
                 if (isViewBeanNameValidForCurrentUI(beanName)) {
                     // if we have an access denied view, this is checked by
                     // getView()
-                    return getAccessDeniedView() != null
+                    return (getAccessDeniedView() != null)
                             || isAccessGrantedToBeanName(beanName);
                 }
             }

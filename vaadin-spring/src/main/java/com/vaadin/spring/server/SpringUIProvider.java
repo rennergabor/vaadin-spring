@@ -15,21 +15,21 @@
  */
 package com.vaadin.spring.server;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.WebApplicationContext;
-
 import com.vaadin.server.UIClassSelectionEvent;
 import com.vaadin.server.UICreateEvent;
 import com.vaadin.server.UIProvider;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.spring.Spring3xUtil;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.internal.UIID;
 import com.vaadin.ui.UI;
 import com.vaadin.util.CurrentInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Vaadin {@link com.vaadin.server.UIProvider} that looks up UI classes from the
@@ -64,15 +64,15 @@ public class SpringUIProvider extends UIProvider {
     @SuppressWarnings("unchecked")
     protected void detectUIs() {
         logger.info("Checking the application context for Vaadin UIs");
-        final String[] uiBeanNames = getWebApplicationContext()
-                .getBeanNamesForAnnotation(SpringUI.class);
+        Spring3xUtil util = new Spring3xUtil(getWebApplicationContext());
+        final String[] uiBeanNames = util.getBeanNamesForAnnotation(SpringUI.class);
         for (String uiBeanName : uiBeanNames) {
             Class<?> beanType = getWebApplicationContext().getType(uiBeanName);
             if (UI.class.isAssignableFrom(beanType)) {
                 logger.info("Found Vaadin UI [{}]", beanType.getCanonicalName());
                 final String path;
                 String tempPath = deriveMappingForUI(uiBeanName);
-                if (tempPath.length() > 0 && !tempPath.startsWith("/")) {
+                if ((tempPath.length() > 0) && !tempPath.startsWith("/")) {
                     path = "/".concat(tempPath);
                 } else {
                     // remove terminal slash from mapping
@@ -128,7 +128,7 @@ public class SpringUIProvider extends UIProvider {
 
     private String extractUIPathFromRequest(VaadinRequest request) {
         String pathInfo = request.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
+        if ((pathInfo != null) && (pathInfo.length() > 1)) {
             String path = pathInfo;
             final int indexOfBang = path.indexOf('!');
             if (indexOfBang > -1) {
