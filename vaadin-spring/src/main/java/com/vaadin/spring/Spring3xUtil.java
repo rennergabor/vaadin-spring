@@ -15,10 +15,11 @@ public class Spring3xUtil {
     private ConfigurableListableBeanFactory beanFactory;
 
     public Spring3xUtil(ApplicationContext wac) {
-        if (!(wac instanceof ConfigurableListableBeanFactory)) {
-            throw new IllegalStateException("dont know what todo...");
+        if (!(wac.getAutowireCapableBeanFactory() instanceof ConfigurableListableBeanFactory)) {
+            throw new IllegalStateException("Can not cast " + wac.getAutowireCapableBeanFactory().getClass().getName()
+                    + " beanFactory to ConfigurableListableBeanFactory...");
         }
-        beanFactory = (ConfigurableListableBeanFactory)wac;
+        beanFactory = (ConfigurableListableBeanFactory)wac.getAutowireCapableBeanFactory();
     }
 
     public String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType) {

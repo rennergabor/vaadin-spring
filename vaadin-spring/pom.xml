@@ -122,8 +122,12 @@
                         <!-- 'version="7.1"' means everything starting from and higher then 7.1 -->
                         <Import-Package>
                             !com.vaadin.client.*,
-                            com.vaadin.*;version="${vaadin.version}"
+                            com.vaadin.*;version="${vaadin.version}",
+                            *
                         </Import-Package>
+                        <Import-Bundle>
+							com.springsource.net.sf.cglib;version="[2.2.0,3.0.0)"
+                        </Import-Bundle>
                         <_nouses>true</_nouses>
                     </instructions>
                 </configuration>
